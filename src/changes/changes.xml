@@ -31,6 +31,9 @@
          - "remove" - Removed
     -->
     <release version="3.0.0" date="2022-MM-DD" description="GA Release 3.0.0">
+      <action issue="LOG4J2-3644" dev="rgoers" type="update">
+        Remove support for package scanning for plugins.
+      </action>
       <action issue="LOG4J2-3626" dev="mattsicker" type="update">
         Flatten the ThreadContextMap interfaces with default methods.
       </action>
@@ -66,9 +69,6 @@
       </action>
       <action issue="LOG4J2-3242" dev="rgoers" type="fix">
         Move JNDI to its own module.
-      </action>
-      <action issue="LOG4J2-2400" dev="rgoers" type="add" due-to="Natalie Meurer">
-        Add Redis Appender.
       </action>
       <action issue="LOG4J2-2749" dev="vy" type="fix" due-to="Oleksii Khomchenko">
         JsonLayout KeyValuePair should discard blank JSON keys.
@@ -201,9 +201,21 @@
         Fixes incorrect constructor call in LocalizedMessageFactory.
       </action>
     </release>
-    <release version="2.19.1" date="TBD" description="GA Release 2.19.1">
+    <release version="2.20.0" date="TBD" description="GA Release 2.20.0">
+      <action issue="LOG4J2-3357" dev="rgoers" type="fix">
+        Use time trigger was expected to fire instead of current time.
+      </action>
+      <action issue="LOG4J2-2297" dev="rgoers" type="fix">
+        Allow java.sql.Time objects to format properly in MapMessages.
+      </action>
+      <action issue="LOG4J2-2785" dev="rgoers" type="add" due-to="Markus Spann">
+        Pattern Layout to abbreviate the name of all logger components except the 2 rightmost.
+      </action>
       <action issue="LOG4J2-2678" dev="pkarwasz" type="update" due-to="Federico D'Ambrosio">
         Add LogEvent timestamp to ProducerRecord in KafkaAppender.
+      </action>
+      <action issue="LOG4J2-3631" dev="pkarwasz" type="fix" due-to="Jeff Thomas">
+        Fix `Configurator#setLevel` for internal classes.
       </action>
     </release>
     <release version="2.19.0" date="2022-09-09" description="GA Release 2.19.0">

@@ -16,6 +16,11 @@
  */
 package org.apache.logging.log4j.core.config.builder.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.AbstractConfiguration;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
@@ -26,11 +31,6 @@ import org.apache.logging.log4j.core.util.Patterns;
 import org.apache.logging.log4j.plugins.Node;
 import org.apache.logging.log4j.plugins.model.PluginType;
 import org.apache.logging.log4j.plugins.util.ResolverUtil;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * This is the general version of the Configuration created by the Builder. It may be extended to
@@ -133,10 +133,6 @@ public class BuiltConfiguration extends AbstractConfiguration {
 
     public StatusConfiguration getStatusConfiguration() {
         return statusConfig;
-    }
-
-    public void setPluginPackages(final String packages) {
-        pluginPackages.addAll(Arrays.asList(packages.split(Patterns.COMMA_SEPARATOR)));
     }
 
     public void setShutdownHook(final String flag) {

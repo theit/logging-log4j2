@@ -16,16 +16,6 @@
  */
 package org.apache.logging.log4j.gctests;
 
-import com.google.monitoring.runtime.instrumentation.AllocationRecorder;
-import com.google.monitoring.runtime.instrumentation.Sampler;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-import org.apache.logging.log4j.ThreadContext;
-import org.apache.logging.log4j.core.util.Constants;
-import org.apache.logging.log4j.message.StringMapMessage;
-
 import java.io.File;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -35,6 +25,18 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+import org.apache.logging.log4j.ThreadContext;
+import org.apache.logging.log4j.core.util.Constants;
+import org.apache.logging.log4j.message.StringMapMessage;
+import org.apache.logging.log4j.spi.LoggingSystemProperties;
+
+import com.google.monitoring.runtime.instrumentation.AllocationRecorder;
+import com.google.monitoring.runtime.instrumentation.Sampler;
 
 import static java.lang.System.getProperty;
 import static org.apache.logging.log4j.util.Constants.isThreadLocalsEnabled;
@@ -50,14 +52,14 @@ public enum GcFreeLoggingTestUtil {;
     public static void executeLogging(final String configurationFile,
                                       final Class<?> testClass) throws Exception {
 
-        System.setProperty("log4j2.enable.threadlocals", "true");
+        System.setProperty(LoggingSystemProperties.SYSTEM_THREAD_LOCALS_ENABLED, "true");
         System.setProperty("log4j2.enable.direct.encoders", "true");
-        System.setProperty("log4j2.is.webapp", "false");
+        System.setProperty(LoggingSystemProperties.SYSTEM_IS_WEBAPP, "false");
         System.setProperty("log4j.configurationFile", configurationFile);
 
         assertTrue(isThreadLocalsEnabled(), "Constants.ENABLE_THREADLOCALS");
         assertTrue(Constants.ENABLE_DIRECT_ENCODERS, "Constants.ENABLE_DIRECT_ENCODERS");
-        assertFalse(isWebApp(), "Constants.IS_WEB_APP");
+        assertFalse(isWebApp(), "Constants.isWebApp()");
 
         final MyCharSeq myCharSeq = new MyCharSeq();
         final Marker testGrandParent = MarkerManager.getMarker("testGrandParent");

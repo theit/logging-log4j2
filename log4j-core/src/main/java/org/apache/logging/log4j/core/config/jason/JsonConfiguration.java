@@ -14,8 +14,16 @@
  * See the license for the specific language governing permissions and
  * limitations under the license.
  */
-
 package org.apache.logging.log4j.core.config.jason;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.AbstractConfiguration;
@@ -30,15 +38,6 @@ import org.apache.logging.log4j.plugins.Node;
 import org.apache.logging.log4j.plugins.model.PluginType;
 import org.apache.logging.log4j.plugins.util.ResolverUtil;
 import org.apache.logging.log4j.util.Cast;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class JsonConfiguration extends AbstractConfiguration implements Reconfigurable {
     private static final String[] VERBOSE_CLASSES = new String[] { ResolverUtil.class.getName() };
@@ -76,7 +75,7 @@ public class JsonConfiguration extends AbstractConfiguration implements Reconfig
                 } else if ("verbose".equalsIgnoreCase(key)) {
                     statusConfig.setVerbosity(value);
                 } else if ("packages".equalsIgnoreCase(key)) {
-                    pluginPackages.addAll(Arrays.asList(value.split(Patterns.COMMA_SEPARATOR)));
+                    LOGGER.warn("The packages attribute is no longer supported");
                 } else if ("name".equalsIgnoreCase(key)) {
                     setName(value);
                 } else if ("monitorInterval".equalsIgnoreCase(key)) {

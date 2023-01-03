@@ -14,20 +14,7 @@
  * See the license for the specific language governing permissions and
  * limitations under the license.
  */
-
 package org.apache.logging.log4j.plugins.di;
-
-import org.apache.logging.log4j.plugins.Named;
-import org.apache.logging.log4j.plugins.Namespace;
-import org.apache.logging.log4j.plugins.internal.util.BeanUtils;
-import org.apache.logging.log4j.plugins.name.AliasesProvider;
-import org.apache.logging.log4j.plugins.name.AnnotatedElementAliasesProvider;
-import org.apache.logging.log4j.plugins.name.AnnotatedElementNameProvider;
-import org.apache.logging.log4j.plugins.name.NameProvider;
-import org.apache.logging.log4j.plugins.util.AnnotationUtil;
-import org.apache.logging.log4j.util.ReflectionUtil;
-import org.apache.logging.log4j.util.Strings;
-import org.apache.logging.log4j.util.Cast;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -40,6 +27,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.apache.logging.log4j.plugins.Named;
+import org.apache.logging.log4j.plugins.Namespace;
+import org.apache.logging.log4j.plugins.internal.util.BeanUtils;
+import org.apache.logging.log4j.plugins.name.AliasesProvider;
+import org.apache.logging.log4j.plugins.name.AnnotatedElementAliasesProvider;
+import org.apache.logging.log4j.plugins.name.AnnotatedElementNameProvider;
+import org.apache.logging.log4j.plugins.name.NameProvider;
+import org.apache.logging.log4j.plugins.util.AnnotationUtil;
+import org.apache.logging.log4j.util.Cast;
+import org.apache.logging.log4j.util.ReflectionUtil;
+import org.apache.logging.log4j.util.Strings;
+
 public final class Keys {
     private Keys() {
         throw new IllegalStateException("Utility class");
@@ -47,9 +46,6 @@ public final class Keys {
 
     public static final String SUBSTITUTOR_NAME = "StringSubstitutor";
     public static final Key<Function<String, String>> SUBSTITUTOR_KEY = new @Named(SUBSTITUTOR_NAME) Key<>() {};
-
-    public static final String PLUGIN_PACKAGES_NAME = "PluginPackages";
-    public static final Key<List<String>> PLUGIN_PACKAGES_KEY = new @Named(PLUGIN_PACKAGES_NAME) Key<>() {};
 
     public static String getNamespace(final AnnotatedElement element) {
         return Optional.ofNullable(AnnotationUtil.getLogicalAnnotation(element, Namespace.class))

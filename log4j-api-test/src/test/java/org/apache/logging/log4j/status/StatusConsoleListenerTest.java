@@ -16,6 +16,9 @@
  */
 package org.apache.logging.log4j.status;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogBuilder;
 import org.apache.logging.log4j.message.Message;
@@ -25,9 +28,6 @@ import org.apache.logging.log4j.simple.SimpleLogger;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 
 public class StatusConsoleListenerTest {
 
@@ -42,10 +42,9 @@ public class StatusConsoleListenerTest {
         Mockito.when(logger.atLevel(Mockito.any())).thenReturn(logBuilder);
         Mockito.when(logBuilder.withThrowable(Mockito.any())).thenReturn(logBuilder);
         Mockito.when(logBuilder.withLocation(Mockito.any())).thenReturn(logBuilder);
-        final SimpleLoggerFactory loggerFactory = Mockito.mock(SimpleLoggerFactory.class);
+        final StatusLoggerFactory loggerFactory = Mockito.mock(StatusLoggerFactory.class);
         Mockito
                 .when(loggerFactory.createSimpleLogger(
-                        Mockito.any(),
                         Mockito.any(),
                         Mockito.any(),
                         Mockito.any()))
@@ -74,7 +73,6 @@ public class StatusConsoleListenerTest {
                 .createSimpleLogger(
                         Mockito.eq("StatusConsoleListener"),
                         Mockito.same(level),
-                        Mockito.any(),
                         Mockito.same(stream));
         Mockito.verify(logger).atLevel(Mockito.same(level));
         Mockito.verify(logBuilder).withThrowable(Mockito.same(throwable));
@@ -125,6 +123,7 @@ public class StatusConsoleListenerTest {
         // Verify the output.
         Assertions
                 .assertThat(output)
+                .isNotBlank()
                 .contains(expectedThrowable.getMessage())
                 .contains(expectedMessage.getFormattedMessage())
                 .doesNotContain(discardedThrowable.getMessage())

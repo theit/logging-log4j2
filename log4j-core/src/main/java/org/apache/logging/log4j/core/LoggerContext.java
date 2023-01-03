@@ -16,7 +16,23 @@
  */
 package org.apache.logging.log4j.core;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.lang.ref.WeakReference;
+import java.net.URI;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.ConfigurationFactory;
 import org.apache.logging.log4j.core.config.ConfigurationListener;
@@ -24,6 +40,7 @@ import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.DefaultConfiguration;
 import org.apache.logging.log4j.core.config.NullConfiguration;
 import org.apache.logging.log4j.core.config.Reconfigurable;
+import org.apache.logging.log4j.core.impl.Log4jProperties;
 import org.apache.logging.log4j.core.jmx.Server;
 import org.apache.logging.log4j.core.util.Cancellable;
 import org.apache.logging.log4j.core.util.ExecutorServices;
@@ -39,23 +56,7 @@ import org.apache.logging.log4j.spi.LoggerContextShutdownAware;
 import org.apache.logging.log4j.spi.LoggerContextShutdownEnabled;
 import org.apache.logging.log4j.spi.LoggerRegistry;
 import org.apache.logging.log4j.spi.Terminable;
-import org.apache.logging.log4j.spi.ThreadContextMapFactory;
 import org.apache.logging.log4j.util.PropertiesUtil;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.lang.ref.WeakReference;
-import java.net.URI;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static org.apache.logging.log4j.core.util.ShutdownCallbackRegistry.SHUTDOWN_HOOK_MARKER;
 
@@ -273,7 +274,7 @@ public class LoggerContext extends AbstractLifeCycle
     @Override
     public void start() {
         LOGGER.debug("Starting {}...", this);
-        if (PropertiesUtil.getProperties().getBooleanProperty("log4j.LoggerContext.stacktrace.on.start", false)) {
+        if (PropertiesUtil.getProperties().getBooleanProperty(Log4jProperties.LOGGER_CONTEXT_STACKTRACE_ON_START, false)) {
             LOGGER.debug("Stack trace to locate invoker",
                     new Exception("Not a real error, showing stack trace to locate invoker"));
         }
@@ -448,7 +449,7 @@ public class LoggerContext extends AbstractLifeCycle
      * @throws NullPointerException if the specified name is {@code null}
      */
     public void setName(final String name) {
-    	contextName = Objects.requireNonNull(name);
+        contextName = Objects.requireNonNull(name);
     }
 
     @Override
@@ -804,7 +805,7 @@ public class LoggerContext extends AbstractLifeCycle
     }
 
     private void initApiModule() {
-        ThreadContextMapFactory.init(); // Or make public and call ThreadContext.init() which calls ThreadContextMapFactory.init().
+        ThreadContext.init();
     }
 
     // LOG4J2-151: changed visibility from private to protected

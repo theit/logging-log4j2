@@ -14,14 +14,23 @@
  * See the license for the specific language governing permissions and
  * limitations under the license.
  */
-
 package org.apache.logging.log4j.perf.jmh;
+
+import java.io.File;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.async.AsyncLoggerContext;
 import org.apache.logging.log4j.core.async.AsyncLoggerContextSelector;
 import org.apache.logging.log4j.core.util.Constants;
+import org.apache.logging.log4j.spi.LoggingSystemProperties;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -37,15 +46,6 @@ import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.annotations.Warmup;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-
 /**
  * Benchmarks Log4j 2, Log4j 1, Logback and JUL using the ERROR level which is enabled for this test.
  * The configuration for each writes to disk.
@@ -60,7 +60,7 @@ import java.util.logging.Level;
 public class FileAppenderThrowableBenchmark {
     static {
         // log4j2
-        System.setProperty("log4j2.is.webapp", "false");
+        System.setProperty(LoggingSystemProperties.SYSTEM_IS_WEBAPP, "false");
         System.setProperty("log4j.configurationFile", "log4j2-perf-file-throwable.xml");
         // log4j 1.2
         System.setProperty("log4j.configuration", "log4j12-perf-file-throwable.xml");

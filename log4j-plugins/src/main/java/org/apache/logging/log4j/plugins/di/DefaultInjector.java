@@ -14,36 +14,7 @@
  * See the license for the specific language governing permissions and
  * limitations under the license.
  */
-
 package org.apache.logging.log4j.plugins.di;
-
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.plugins.FactoryType;
-import org.apache.logging.log4j.plugins.Inject;
-import org.apache.logging.log4j.plugins.Node;
-import org.apache.logging.log4j.plugins.PluginException;
-import org.apache.logging.log4j.plugins.QualifierType;
-import org.apache.logging.log4j.plugins.ScopeType;
-import org.apache.logging.log4j.plugins.Singleton;
-import org.apache.logging.log4j.plugins.condition.Conditional;
-import org.apache.logging.log4j.plugins.convert.TypeConverter;
-import org.apache.logging.log4j.plugins.convert.TypeConverters;
-import org.apache.logging.log4j.plugins.model.PluginNamespace;
-import org.apache.logging.log4j.plugins.model.PluginRegistry;
-import org.apache.logging.log4j.plugins.model.PluginType;
-import org.apache.logging.log4j.plugins.util.AnnotationUtil;
-import org.apache.logging.log4j.plugins.util.OrderedComparator;
-import org.apache.logging.log4j.plugins.util.TypeUtil;
-import org.apache.logging.log4j.plugins.validation.Constraint;
-import org.apache.logging.log4j.plugins.validation.ConstraintValidationException;
-import org.apache.logging.log4j.plugins.validation.ConstraintValidator;
-import org.apache.logging.log4j.plugins.visit.NodeVisitor;
-import org.apache.logging.log4j.status.StatusLogger;
-import org.apache.logging.log4j.util.Lazy;
-import org.apache.logging.log4j.util.Cast;
-import org.apache.logging.log4j.util.EnglishEnums;
-import org.apache.logging.log4j.util.ServiceRegistry;
-import org.apache.logging.log4j.util.StringBuilders;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
@@ -71,6 +42,34 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.plugins.FactoryType;
+import org.apache.logging.log4j.plugins.Inject;
+import org.apache.logging.log4j.plugins.Node;
+import org.apache.logging.log4j.plugins.PluginException;
+import org.apache.logging.log4j.plugins.QualifierType;
+import org.apache.logging.log4j.plugins.ScopeType;
+import org.apache.logging.log4j.plugins.Singleton;
+import org.apache.logging.log4j.plugins.condition.Conditional;
+import org.apache.logging.log4j.plugins.convert.TypeConverter;
+import org.apache.logging.log4j.plugins.convert.TypeConverters;
+import org.apache.logging.log4j.plugins.model.PluginNamespace;
+import org.apache.logging.log4j.plugins.model.PluginRegistry;
+import org.apache.logging.log4j.plugins.model.PluginType;
+import org.apache.logging.log4j.plugins.util.AnnotationUtil;
+import org.apache.logging.log4j.plugins.util.OrderedComparator;
+import org.apache.logging.log4j.plugins.util.TypeUtil;
+import org.apache.logging.log4j.plugins.validation.Constraint;
+import org.apache.logging.log4j.plugins.validation.ConstraintValidationException;
+import org.apache.logging.log4j.plugins.validation.ConstraintValidator;
+import org.apache.logging.log4j.plugins.visit.NodeVisitor;
+import org.apache.logging.log4j.status.StatusLogger;
+import org.apache.logging.log4j.util.Cast;
+import org.apache.logging.log4j.util.EnglishEnums;
+import org.apache.logging.log4j.util.Lazy;
+import org.apache.logging.log4j.util.ServiceRegistry;
+import org.apache.logging.log4j.util.StringBuilders;
 
 class DefaultInjector implements Injector {
     private static final Logger LOGGER = StatusLogger.getLogger();
@@ -306,19 +305,14 @@ class DefaultInjector implements Injector {
     }
 
     private Supplier<PluginNamespace> createPluginNamespaceFactory(final Key<PluginNamespace> key) {
-        return Lazy.lazy(() -> getInstance(PluginRegistry.class).getNamespace(key.getNamespace(), getPluginPackages()))::value;
-    }
-
-    private List<String> getPluginPackages() {
-        final Binding<List<String>> pluginPackagesBinding = bindingMap.get(Keys.PLUGIN_PACKAGES_KEY, List.of());
-        return pluginPackagesBinding != null ? pluginPackagesBinding.getSupplier().get() : List.of();
+        return Lazy.lazy(() -> getInstance(PluginRegistry.class).getNamespace(key.getNamespace()))::value;
     }
 
     private <T> Stream<PluginType<T>> streamPluginsFromNamespace(final Key<T> itemKey) {
         if (itemKey == null) {
             return Stream.empty();
         }
-        final PluginNamespace namespace = getInstance(PluginRegistry.class).getNamespace(itemKey.getNamespace(), getPluginPackages());
+        final PluginNamespace namespace = getInstance(PluginRegistry.class).getNamespace(itemKey.getNamespace());
         final Type type = itemKey.getType();
         return namespace.stream()
                 .filter(pluginType -> TypeUtil.isAssignable(type, pluginType.getPluginClass()))

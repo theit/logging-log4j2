@@ -14,18 +14,20 @@
  * See the license for the specific language governing permissions and
  * limitations under the license.
  */
-
 package org.apache.logging.log4j.core.osgi;
 
+import java.util.Hashtable;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.util.Constants;
+import org.apache.logging.log4j.core.impl.Log4jProperties;
 import org.apache.logging.log4j.core.util.ContextDataProvider;
 import org.apache.logging.log4j.plugins.di.Injector;
 import org.apache.logging.log4j.plugins.di.InjectorCallback;
 import org.apache.logging.log4j.plugins.di.Key;
 import org.apache.logging.log4j.plugins.model.PluginRegistry;
 import org.apache.logging.log4j.plugins.model.PluginService;
-import org.apache.logging.log4j.spi.Provider;
 import org.apache.logging.log4j.util.PropertiesUtil;
 import org.apache.logging.log4j.util.ServiceRegistry;
 import org.osgi.framework.Bundle;
@@ -33,10 +35,6 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.wiring.BundleWiring;
-
-import java.util.Hashtable;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * OSGi BundleActivator.
@@ -71,19 +69,17 @@ public final class Activator implements BundleActivator {
         final ClassLoader classLoader = bundle.adapt(BundleWiring.class).getClassLoader();
         registry.registerBundleServices(InjectorCallback.class, bundleId, List.of(injectorCallback));
         registry.loadServicesFromBundle(PluginService.class, bundleId, classLoader);
-        registry.loadServicesFromBundle(Provider.class, bundleId, classLoader);
         registry.loadServicesFromBundle(ContextDataProvider.class, bundleId, classLoader);
         registry.loadServicesFromBundle(InjectorCallback.class, bundleId, classLoader);
         // allow the user to override the default ContextSelector (e.g., by using BasicContextSelector for a global cfg)
-        if (PropertiesUtil.getProperties().getStringProperty(Constants.LOG4J_CONTEXT_SELECTOR) == null) {
-            System.setProperty(Constants.LOG4J_CONTEXT_SELECTOR, BundleContextSelector.class.getName());
+        if (PropertiesUtil.getProperties().getStringProperty(Log4jProperties.CONTEXT_SELECTOR_CLASS_NAME) == null) {
+            System.setProperty(Log4jProperties.CONTEXT_SELECTOR_CLASS_NAME, BundleContextSelector.class.getName());
         }
         contextRef.compareAndSet(null, context);
     }
 
     @Override
     public void stop(final BundleContext context) throws Exception {
-        ServiceRegistry.getInstance().unregisterBundleServices(context.getBundle().getBundleId());
         if (injectorCallback != null) {
             injectorCallback = null;
             injectorCallbackServiceRegistration.unregister();

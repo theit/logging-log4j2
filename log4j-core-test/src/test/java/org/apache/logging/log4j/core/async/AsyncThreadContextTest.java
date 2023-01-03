@@ -16,11 +16,18 @@
  */
 package org.apache.logging.log4j.core.async;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.URI;
+
 import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.ThreadContextTestAccess;
 import org.apache.logging.log4j.core.impl.Log4jContextFactory;
+import org.apache.logging.log4j.core.impl.Log4jProperties;
 import org.apache.logging.log4j.core.jmx.RingBufferAdmin;
 import org.apache.logging.log4j.core.selector.ClassLoaderContextSelector;
 import org.apache.logging.log4j.core.selector.ContextSelector;
@@ -29,26 +36,23 @@ import org.apache.logging.log4j.core.util.NetUtils;
 import org.apache.logging.log4j.plugins.di.DI;
 import org.apache.logging.log4j.plugins.di.Injector;
 import org.apache.logging.log4j.spi.DefaultThreadContextMap;
+import org.apache.logging.log4j.spi.LoggingSystemProperties;
 import org.apache.logging.log4j.spi.ReadOnlyThreadContextMap;
 import org.apache.logging.log4j.test.junit.CleanUpFiles;
-import org.apache.logging.log4j.util.Unbox;
 import org.apache.logging.log4j.util.PropertiesUtil;
+import org.apache.logging.log4j.util.Unbox;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.URI;
+import org.junitpioneer.jupiter.SetSystemProperty;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 @Tag("sleepy")
+@SetSystemProperty(key = Log4jProperties.ASYNC_LOGGER_RING_BUFFER_SIZE, value = "128") // minimum ringbuffer size
+@SetSystemProperty(key = Log4jProperties.ASYNC_CONFIG_RING_BUFFER_SIZE, value = "128") // minimum ringbuffer size
 public class AsyncThreadContextTest {
 
     private final static int LINE_COUNT = 130;
@@ -59,18 +63,10 @@ public class AsyncThreadContextTest {
             new File("target", "AsyncAppenderContextTest.log"), //
     };
 
-    @BeforeAll
-    public static void beforeClass() {
-        System.setProperty("AsyncLogger.RingBufferSize", "128"); // minimum ringbuffer size
-        System.setProperty("AsyncLoggerConfig.RingBufferSize", "128"); // minimum ringbuffer size
-    }
-
     @AfterAll
     public static void afterClass() {
-        System.clearProperty("AsyncLogger.RingBufferSize");
-        System.clearProperty("AsyncLoggerConfig.RingBufferSize");
-        System.clearProperty("log4j2.garbagefree.threadContextMap");
-        System.clearProperty("log4j2.threadContextMap");
+        System.clearProperty(LoggingSystemProperties.THREAD_CONTEXT_GARBAGE_FREE_ENABLED);
+        System.clearProperty(LoggingSystemProperties.THREAD_CONTEXT_MAP_CLASS);
     }
 
     enum Mode {
@@ -91,10 +87,10 @@ public class AsyncThreadContextTest {
         WEBAPP, GARBAGE_FREE, COPY_ON_WRITE;
 
         void init() {
-            System.clearProperty("log4j2.threadContextMap");
+            System.clearProperty(LoggingSystemProperties.THREAD_CONTEXT_MAP_CLASS);
             final String PACKAGE = "org.apache.logging.log4j.spi.";
-            System.setProperty("log4j2.threadContextMap", PACKAGE + implClassSimpleName());
-            ((PropertiesUtil) PropertiesUtil.getProperties()).reload();
+            System.setProperty(LoggingSystemProperties.THREAD_CONTEXT_MAP_CLASS, PACKAGE + implClassSimpleName());
+            PropertiesUtil.getProperties().reload();
             ThreadContextTestAccess.init();
         }
 

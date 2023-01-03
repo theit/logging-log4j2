@@ -16,9 +16,15 @@
  */
 package org.apache.logging.log4j.core.config.json;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.AbstractConfiguration;
 import org.apache.logging.log4j.core.config.Configuration;
@@ -31,14 +37,9 @@ import org.apache.logging.log4j.plugins.Node;
 import org.apache.logging.log4j.plugins.model.PluginType;
 import org.apache.logging.log4j.plugins.util.ResolverUtil;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Creates a Node hierarchy from a JSON file.
@@ -82,7 +83,7 @@ public class JsonConfiguration extends AbstractConfiguration implements Reconfig
                 } else if ("verbose".equalsIgnoreCase(entry.getKey())) {
                     statusConfig.setVerbosity(value);
                 } else if ("packages".equalsIgnoreCase(key)) {
-                    pluginPackages.addAll(Arrays.asList(value.split(Patterns.COMMA_SEPARATOR)));
+                    LOGGER.warn("The packages attribute is no longer supported");
                 } else if ("name".equalsIgnoreCase(key)) {
                     setName(value);
                 } else if ("monitorInterval".equalsIgnoreCase(key)) {

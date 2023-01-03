@@ -14,18 +14,18 @@
  * See the license for the specific language governing permissions and
  * limitations under the license.
  */
-
 package org.apache.logging.log4j.core.config;
+
+import java.util.Objects;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.impl.Log4jProperties;
 import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.status.StatusLogger;
-import org.apache.logging.log4j.util.Supplier;
 import org.apache.logging.log4j.util.PropertiesUtil;
-
-import java.util.Objects;
+import org.apache.logging.log4j.util.Supplier;
 
 /**
  * Reliability strategy that sleeps unconditionally for some time before allowing a Configuration to be stopped.
@@ -41,7 +41,7 @@ public class AwaitUnconditionallyReliabilityStrategy implements ReliabilityStrat
     }
 
     private static long sleepMillis() {
-        return PropertiesUtil.getProperties().getLongProperty("log4j.waitMillisBeforeStopOldConfig",
+        return PropertiesUtil.getProperties().getLongProperty(Log4jProperties.CONFIG_RELIABILITY_STRATEGY_AWAIT_UNCONDITIONALLY_MILLIS,
                 DEFAULT_SLEEP_MILLIS);
     }
 

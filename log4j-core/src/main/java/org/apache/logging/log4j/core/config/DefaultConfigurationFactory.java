@@ -14,21 +14,7 @@
  * See the license for the specific language governing permissions and
  * limitations under the license.
  */
-
 package org.apache.logging.log4j.core.config;
-
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.composite.CompositeConfiguration;
-import org.apache.logging.log4j.core.util.Loader;
-import org.apache.logging.log4j.core.util.NetUtils;
-import org.apache.logging.log4j.plugins.Inject;
-import org.apache.logging.log4j.plugins.di.Injector;
-import org.apache.logging.log4j.util.Lazy;
-import org.apache.logging.log4j.util.PropertyEnvironment;
-import org.apache.logging.log4j.util.Strings;
-import org.apache.logging.log4j.util.LoaderUtil;
-import org.apache.logging.log4j.util.PropertiesUtil;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,6 +23,21 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.composite.CompositeConfiguration;
+import org.apache.logging.log4j.core.impl.Log4jProperties;
+import org.apache.logging.log4j.core.util.Loader;
+import org.apache.logging.log4j.core.util.NetUtils;
+import org.apache.logging.log4j.plugins.Inject;
+import org.apache.logging.log4j.plugins.di.Injector;
+import org.apache.logging.log4j.spi.LoggingSystemProperties;
+import org.apache.logging.log4j.util.Lazy;
+import org.apache.logging.log4j.util.LoaderUtil;
+import org.apache.logging.log4j.util.PropertiesUtil;
+import org.apache.logging.log4j.util.PropertyEnvironment;
+import org.apache.logging.log4j.util.Strings;
 
 /**
  * Default factory for using a plugin selected based on the configuration source.
@@ -159,9 +160,10 @@ public class DefaultConfigurationFactory extends ConfigurationFactory {
         LOGGER.warn("No Log4j 2 configuration file found. " +
                 "Using default configuration (logging only errors to the console), " +
                 "or user programmatically provided configurations. " +
-                "Set system property 'log4j2.debug' " +
+                "Set system property 'log4j2.*.{}' " +
                 "to show Log4j 2 internal initialization logging. " +
-                "See https://logging.apache.org/log4j/2.x/manual/configuration.html for instructions on how to configure Log4j 2");
+                "See https://logging.apache.org/log4j/2.x/manual/configuration.html for instructions on how to configure Log4j 2",
+                LoggingSystemProperties.SYSTEM_DEBUG);
         return new DefaultConfiguration();
     }
 
@@ -294,7 +296,7 @@ public class DefaultConfigurationFactory extends ConfigurationFactory {
     private static List<ConfigurationFactory> loadConfigurationFactories(final Injector injector) {
         final List<ConfigurationFactory> factories = new ArrayList<>();
 
-        Optional.ofNullable(PropertiesUtil.getProperties().getStringProperty(CONFIGURATION_FACTORY_PROPERTY))
+        Optional.ofNullable(PropertiesUtil.getProperties().getStringProperty(Log4jProperties.CONFIG_CONFIGURATION_FACTORY_CLASS_NAME))
                 .flatMap(DefaultConfigurationFactory::tryLoadFactoryClass)
                 .map(clazz -> {
                     try {

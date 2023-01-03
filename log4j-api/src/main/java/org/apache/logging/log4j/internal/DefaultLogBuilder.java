@@ -25,9 +25,9 @@ import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.SimpleMessage;
 import org.apache.logging.log4j.status.StatusLogger;
 import org.apache.logging.log4j.util.LambdaUtil;
+import org.apache.logging.log4j.util.StackLocatorUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.apache.logging.log4j.util.Supplier;
-import org.apache.logging.log4j.util.StackLocatorUtil;
 
 
 /**
@@ -109,6 +109,15 @@ public class DefaultLogBuilder implements BridgeAware, LogBuilder {
         if (isValid()) {
             logMessage(message);
         }
+    }
+
+    @Override
+    public Message logAndGet(Supplier<Message> messageSupplier) {
+        Message message = null;
+        if (isValid()) {
+            logMessage(message = messageSupplier.get());
+        }
+        return message;
     }
 
     @Override

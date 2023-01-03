@@ -14,7 +14,6 @@
  * See the license for the specific language governing permissions and
  * limitations under the license.
  */
-
 package org.apache.logging.log4j.util;
 
 import java.lang.invoke.MethodHandles;
@@ -139,7 +138,7 @@ final class LazyUtil {
                 return unwrapNull(currentValue);
             }
             final T newValue = supplier.get();
-            if (VALUE.compareAndSet(this, (Object) null, wrapNull(newValue))) {
+            if (VALUE.compareAndExchangeRelease(this, null, wrapNull(newValue)) == null) {
                 return newValue;
             }
             final Object value = VALUE.getAcquire(this);
@@ -161,6 +160,35 @@ final class LazyUtil {
         @Override
         public String toString() {
             return isInitialized() ? String.valueOf(VALUE.getOpaque(value)) : "Lazy value not initialized";
+        }
+    }
+
+    static class PureLazy<T> implements Lazy<T> {
+        private final Supplier<T> supplier;
+        private Object value;
+
+        public PureLazy(final Supplier<T> supplier) {
+            this.supplier = supplier;
+        }
+
+        @Override
+        public T value() {
+            Object value = this.value;
+            if (value == null) {
+                value = supplier.get();
+                this.value = wrapNull(value);
+            }
+            return unwrapNull(value);
+        }
+
+        @Override
+        public boolean isInitialized() {
+            return value != null;
+        }
+
+        @Override
+        public void set(final T newValue) {
+            value = newValue;
         }
     }
 }

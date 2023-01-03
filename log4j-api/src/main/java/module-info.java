@@ -15,8 +15,8 @@
  * limitations under the license.
  */
 
-import org.apache.logging.log4j.util.PropertySource;
 import org.apache.logging.log4j.util.EnvironmentPropertySource;
+import org.apache.logging.log4j.util.PropertySource;
 import org.apache.logging.log4j.util.SystemPropertiesPropertySource;
 
 /**
@@ -38,6 +38,7 @@ module org.apache.logging.log4j {
     exports org.apache.logging.log4j.status;
     exports org.apache.logging.log4j.util;
 
+    requires static java.sql;
     requires static org.osgi.framework;
     uses org.apache.logging.log4j.spi.Provider;
     uses PropertySource;

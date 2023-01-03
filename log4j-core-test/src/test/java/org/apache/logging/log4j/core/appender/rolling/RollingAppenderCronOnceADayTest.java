@@ -16,15 +16,6 @@
  */
 package org.apache.logging.log4j.core.appender.rolling;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.test.junit.LoggerContextSource;
-import org.apache.logging.log4j.core.util.CronExpression;
-import org.apache.logging.log4j.plugins.Named;
-import org.apache.logging.log4j.status.StatusLogger;
-import org.apache.logging.log4j.test.junit.CleanUpDirectories;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import java.io.File;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -33,10 +24,23 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.concurrent.CountDownLatch;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.test.junit.LoggerContextSource;
+import org.apache.logging.log4j.core.util.CronExpression;
+import org.apache.logging.log4j.plugins.Named;
+import org.apache.logging.log4j.status.StatusLogger;
+import org.apache.logging.log4j.test.junit.CleanUpDirectories;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Tag("flaky")
+@Disabled("https://issues.apache.org/jira/browse/LOG4J2-3633")
 public class RollingAppenderCronOnceADayTest extends AbstractRollingListenerTest {
 
     private static final int CRON_DELAY = 10;
@@ -50,6 +54,7 @@ public class RollingAppenderCronOnceADayTest extends AbstractRollingListenerTest
     private static String cronExpression;
     private static Duration remainingTime;
     private final CountDownLatch rollover = new CountDownLatch(1);
+
 
     @BeforeAll
     public static void beforeClass() throws Exception {

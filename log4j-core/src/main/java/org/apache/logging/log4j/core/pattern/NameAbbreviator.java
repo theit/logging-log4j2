@@ -16,10 +16,11 @@
  */
 package org.apache.logging.log4j.core.pattern;
 
-import org.apache.logging.log4j.util.PerformanceSensitive;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import org.apache.logging.log4j.util.PerformanceSensitive;
 
 
 /**
@@ -53,6 +54,11 @@ public abstract class NameAbbreviator {
 
             if (trimmed.isEmpty()) {
                 return DEFAULT;
+            }
+
+            NameAbbreviator dwa = DynamicWordAbbreviator.create(trimmed);
+            if (dwa != null) {
+                return dwa;
             }
 
             final boolean isNegativeNumber;
@@ -260,7 +266,7 @@ public abstract class NameAbbreviator {
      * Fragment of an pattern abbreviator.
      */
     private static final class PatternAbbreviatorFragment {
-        
+
         static final PatternAbbreviatorFragment[] EMPTY_ARRAY = {};
 
         /**
@@ -319,6 +325,12 @@ public abstract class NameAbbreviator {
             }
             return nextDot + 1;
         }
+
+        @Override
+        public String toString() {
+            return String.format("%s[charCount=%s, ellipsis=%s]",
+                    getClass().getSimpleName(), charCount, Integer.toHexString(ellipsis));
+        }
     }
 
     /**
@@ -363,6 +375,11 @@ public abstract class NameAbbreviator {
 
         PatternAbbreviatorFragment fragment(int index) {
             return fragments[Math.min(index, fragments.length - 1)];
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%s[fragments=%s]", getClass().getSimpleName(), Arrays.toString(fragments));
         }
     }
 }

@@ -14,20 +14,7 @@
  * See the license for the specific language governing permissions and
  * limitations under the license.
  */
-
 package org.apache.logging.log4j.plugins.model;
-
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.plugins.Configurable;
-import org.apache.logging.log4j.plugins.Plugin;
-import org.apache.logging.log4j.plugins.PluginAliases;
-import org.apache.logging.log4j.plugins.Singleton;
-import org.apache.logging.log4j.plugins.di.Keys;
-import org.apache.logging.log4j.plugins.util.ResolverUtil;
-import org.apache.logging.log4j.status.StatusLogger;
-import org.apache.logging.log4j.util.Lazy;
-import org.apache.logging.log4j.util.Strings;
-import org.apache.logging.log4j.util.LoaderUtil;
 
 import java.io.IOException;
 import java.net.URI;
@@ -42,6 +29,18 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.plugins.Configurable;
+import org.apache.logging.log4j.plugins.Plugin;
+import org.apache.logging.log4j.plugins.PluginAliases;
+import org.apache.logging.log4j.plugins.Singleton;
+import org.apache.logging.log4j.plugins.di.Keys;
+import org.apache.logging.log4j.plugins.util.ResolverUtil;
+import org.apache.logging.log4j.status.StatusLogger;
+import org.apache.logging.log4j.util.Lazy;
+import org.apache.logging.log4j.util.LoaderUtil;
+import org.apache.logging.log4j.util.Strings;
 
 import static org.apache.logging.log4j.util.Unbox.box;
 
@@ -249,7 +248,7 @@ public class PluginRegistry {
      * Gets the registered plugins for the given namespace. If additional scan packages are provided, then plugins
      * are scanned and loaded from there as well.
      */
-    public PluginNamespace getNamespace(final String namespace, final List<String> additionalScanPackages) {
+    public PluginNamespace getNamespace(final String namespace) {
         final var pluginNamespace = new PluginNamespace(namespace);
 
         // First, iterate the PluginService services and legacy Log4j2Plugin.dat files found in the main CLASSPATH
@@ -260,17 +259,6 @@ public class PluginRegistry {
 
         // Next, iterate OSGi modules that provide plugins as OSGi services
         namespacesByBundleId.values().forEach(bundle -> pluginNamespace.mergeAll(bundle.get(namespace)));
-
-        // Finally, iterate over additional packages from configuration
-        if (additionalScanPackages != null) {
-            for (final String pkg : additionalScanPackages) {
-                pluginNamespace.mergeAll(namespacesByPackage.computeIfAbsent(pkg, ignored -> {
-                    final var bundle = new Namespaces();
-                    loadFromPackage(bundle, pkg);
-                    return bundle;
-                }).get(namespace));
-            }
-        }
 
         LOGGER.debug("Discovered {} plugins in namespace '{}'", box(pluginNamespace.size()), namespace);
 

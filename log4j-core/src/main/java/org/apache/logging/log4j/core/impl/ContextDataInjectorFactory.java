@@ -24,8 +24,8 @@ import org.apache.logging.log4j.spi.CopyOnWrite;
 import org.apache.logging.log4j.spi.DefaultThreadContextMap;
 import org.apache.logging.log4j.spi.ReadOnlyThreadContextMap;
 import org.apache.logging.log4j.status.StatusLogger;
-import org.apache.logging.log4j.util.ReadOnlyStringMap;
 import org.apache.logging.log4j.util.PropertiesUtil;
+import org.apache.logging.log4j.util.ReadOnlyStringMap;
 
 /**
  * Factory for ContextDataInjectors. Returns a new {@code ContextDataInjector} instance based on the value of system
@@ -66,7 +66,7 @@ public class ContextDataInjectorFactory {
      * @see ContextDataInjector
      */
     public static ContextDataInjector createInjector() {
-        final String className = PropertiesUtil.getProperties().getStringProperty("log4j2.ContextDataInjector");
+        final String className = PropertiesUtil.getProperties().getStringProperty(Log4jProperties.THREAD_CONTEXT_DATA_INJECTOR_CLASS_NAME);
         if (className == null) {
             return createDefaultInjector();
         }

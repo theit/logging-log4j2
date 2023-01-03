@@ -16,6 +16,11 @@
  */
 package org.apache.logging.log4j.core.config;
 
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,13 +29,8 @@ import org.apache.logging.log4j.core.impl.Log4jContextFactory;
 import org.apache.logging.log4j.core.util.NetUtils;
 import org.apache.logging.log4j.spi.LoggerContextFactory;
 import org.apache.logging.log4j.status.StatusLogger;
-import org.apache.logging.log4j.util.Strings;
 import org.apache.logging.log4j.util.StackLocatorUtil;
-
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import org.apache.logging.log4j.util.Strings;
 
 /**
  * Initializes and configure the Logging system. This class provides several ways to construct a LoggerContext using
@@ -46,14 +46,14 @@ public final class Configurator {
         final LoggerContextFactory factory = LogManager.getFactory();
         if (factory instanceof Log4jContextFactory) {
             return (Log4jContextFactory) factory;
-        } else if (factory != null) {
+        }
+        if (factory != null) {
             LOGGER.error("LogManager returned an instance of {} which does not implement {}. Unable to initialize Log4j.",
                     factory.getClass().getName(), Log4jContextFactory.class.getName());
-            return null;
         } else {
             LOGGER.fatal("LogManager did not return a LoggerContextFactory. This indicates something has gone terribly wrong!");
-            return null;
         }
+        return null;
     }
 
     /**
@@ -324,16 +324,38 @@ public final class Configurator {
      * @return the given logger
      */
     public static Logger setLevel(final Logger logger, final Level level) {
-        setLevel(logger.getName(), level);
+        setLevel(LoggerContext.getContext(StackLocatorUtil.getCallerClassLoader(2), false, null), logger.getName(), level);
         return logger;
     }
-    
+
+    /**
+     * Sets a logger's level.
+     *
+     * @param clazz
+     *            the logger
+     * @param level
+     *            the new level
+     */
+    public static void setLevel(final Class<?> clazz, final Level level) {
+        final String canonicalName = clazz.getCanonicalName();
+        setLevel(LoggerContext.getContext(StackLocatorUtil.getCallerClassLoader(2), false, null),
+                canonicalName != null ? canonicalName : clazz.getName(), level);
+    }
+
     private static boolean setLevel(final LoggerConfig loggerConfig, final Level level) {
         final boolean set = !loggerConfig.getLevel().equals(level);
         if (set) {
             loggerConfig.setLevel(level);
         }
         return set;
+    }
+
+    private static void setLevel(final LoggerContext loggerContext, final String loggerName, final Level level) {
+        if (Strings.isEmpty(loggerName)) {
+            setRootLevel(level, loggerContext);
+        } else if (setLevel(loggerName, level, loggerContext.getConfiguration())) {
+            loggerContext.updateLoggers();
+        }
     }
 
     /**
@@ -366,12 +388,7 @@ public final class Configurator {
      *            the new level
      */
     public static void setLevel(final String loggerName, final Level level) {
-        final LoggerContext loggerContext = LoggerContext.getContext(StackLocatorUtil.getCallerClassLoader(2), false, null);
-        if (Strings.isEmpty(loggerName)) {
-            setRootLevel(level, loggerContext);
-        } else if (setLevel(loggerName, level, loggerContext.getConfiguration())) {
-            loggerContext.updateLoggers();
-        }
+        setLevel(LoggerContext.getContext(StackLocatorUtil.getCallerClassLoader(2), false, null), loggerName, level);
     }
 
     /**
@@ -383,7 +400,7 @@ public final class Configurator {
      *            the new level
      */
     public static void setLevel(final String loggerName, final String level) {
-        setLevel(loggerName, Level.toLevel(level));
+        setLevel(LoggerContext.getContext(StackLocatorUtil.getCallerClassLoader(2), false, null), loggerName, Level.toLevel(level));
     }
 
     private static boolean setLevel(final String loggerName, final Level level, final Configuration config) {

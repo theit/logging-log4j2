@@ -16,22 +16,6 @@
  */
 package org.apache.logging.log4j.core.appender;
 
-import org.apache.logging.log4j.core.Appender;
-import org.apache.logging.log4j.core.Filter;
-import org.apache.logging.log4j.core.Layout;
-import org.apache.logging.log4j.core.config.Property;
-import org.apache.logging.log4j.core.util.CloseShieldOutputStream;
-import org.apache.logging.log4j.core.util.Loader;
-import org.apache.logging.log4j.core.util.Throwables;
-import org.apache.logging.log4j.plugins.Configurable;
-import org.apache.logging.log4j.plugins.Plugin;
-import org.apache.logging.log4j.plugins.PluginBuilderAttribute;
-import org.apache.logging.log4j.plugins.PluginFactory;
-import org.apache.logging.log4j.plugins.validation.constraints.Required;
-import org.apache.logging.log4j.util.PropertyEnvironment;
-import org.apache.logging.log4j.util.Chars;
-import org.apache.logging.log4j.util.PropertiesUtil;
-
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -42,6 +26,23 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.nio.charset.Charset;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.Filter;
+import org.apache.logging.log4j.core.Layout;
+import org.apache.logging.log4j.core.config.Property;
+import org.apache.logging.log4j.core.impl.Log4jProperties;
+import org.apache.logging.log4j.core.util.CloseShieldOutputStream;
+import org.apache.logging.log4j.core.util.Loader;
+import org.apache.logging.log4j.core.util.Throwables;
+import org.apache.logging.log4j.plugins.Configurable;
+import org.apache.logging.log4j.plugins.Plugin;
+import org.apache.logging.log4j.plugins.PluginBuilderAttribute;
+import org.apache.logging.log4j.plugins.PluginFactory;
+import org.apache.logging.log4j.plugins.validation.constraints.Required;
+import org.apache.logging.log4j.util.Chars;
+import org.apache.logging.log4j.util.PropertiesUtil;
+import org.apache.logging.log4j.util.PropertyEnvironment;
 
 /**
  * Appends log events to <code>System.out</code> or <code>System.err</code> using a layout specified by the user. The
@@ -188,7 +189,7 @@ public final class ConsoleAppender extends AbstractOutputStreamAppender<OutputSt
             throw new IllegalStateException("Unsupported default encoding " + enc, ex);
         }
         final PropertyEnvironment properties = PropertiesUtil.getProperties();
-        if (!properties.isOsWindows() || properties.getBooleanProperty("log4j.skipJansi", true) || direct) {
+        if (!properties.isOsWindows() || properties.getBooleanProperty(Log4jProperties.JANSI_DISABLED, true) || direct) {
             return outputStream;
         }
         try {
