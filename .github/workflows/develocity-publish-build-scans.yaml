@@ -31,12 +31,12 @@ jobs:
     steps:
 
       - name: Setup Build Scan link capture
-        uses: gradle/develocity-actions/setup-maven@4a2aed82eea165ba2d5c494fc2a8730d7fdff229   # 1.4
+        uses: gradle/develocity-actions/setup-maven@0e1f30c14ab56d0c1ecf229a0ffc3eb3e40e4642   # 2.2
         with:
           capture-build-scan-links: true
 
       - name: Publish Build Scans
-        uses: gradle/develocity-actions/maven-publish-build-scan@4a2aed82eea165ba2d5c494fc2a8730d7fdff229   # 1.4
+        uses: gradle/develocity-actions/maven-publish-build-scan@0e1f30c14ab56d0c1ecf229a0ffc3eb3e40e4642   # 2.2
         with:
           develocity-url: 'https://develocity.apache.org'
           develocity-access-key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
